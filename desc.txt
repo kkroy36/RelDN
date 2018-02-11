@@ -1,0 +1,4 @@
+input_node: a("true") | b("likes(U,M);action(M)") | c("true") | d("likes(U,M);drama(M)" | i("true") | j("old(U)") | k("teacher(U)")
+node: e("s1(U)") | f("s2(U)") | g("h1(U)") | h("h2(U)") | l("s3(U)")
+output_node: m("male(U)")
+connect: a-e,1 | b-e,1 | c-f,1 | d-f,1 | e-g,1 | f-h,1 | g-l,1 | h-l,1 | i-l,1 | j-l,1 | k-l,1 | l-m,1
