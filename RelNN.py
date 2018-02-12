@@ -9,11 +9,18 @@ class Node(object):
         self.clause = clause
         self.ip = ip
         self.op = op
+        self.delta = None
         if ip:
             self.value = 1
         else:
             self.value = None
         self.connections = []
+
+    def set_delta(self,value):
+        self.delta = value
+
+    def get_delta(self):
+        return self.delta
 
     def add_connection(self,node,weight):
         self.connections.append([node,weight])
@@ -87,7 +94,52 @@ class RelNN(object):
         for example in self.train_examples:
             self.compute_ip_node_values(example)
             self.forward_propogate()
-            exit()
+            self.backward_propogate(example)
+
+    def compute_output_delta(self,example):
+        example_value = float(example.split(" ")[1])
+        nodes = self.get_nodes()
+        for node in nodes:
+            if node.is_output():
+                delta = example_value - node.get_value()
+                node.set_delta(delta)
+
+    def finished_all_deltas(self):
+        nodes = self.get_nodes()
+        for node in nodes:
+            if node.get_delta()==None:
+                return False
+        return True
+
+    def compute_deltas(self,example):
+        nodes = self.get_nodes()
+        self.compute_output_delta(example)
+        while True:
+            for node in nodes:
+                if node.is_output():
+                    continue
+                connections = node.get_connections()
+                deltas_ready = True
+                sum_of_deltas = 0
+                for connection in connections:
+                    if connection[0].get_delta() == None:
+                        deltas_ready = False
+                        break
+                    weight = node.get_connection_weight(connection[0])
+                    sum_of_deltas += weight*connection[0].get_delta()
+                if not deltas_ready:
+                    continue
+                output = node.get_value()
+                node.set_delta(output*(1-output)*sum_of_deltas)
+            if self.finished_all_deltas():
+                break
+
+    def backward_propogate(self,example):
+        self.compute_deltas(example)
+        nodes = self.get_nodes()
+        for node in nodes:
+            print(node.get_label(),node.get_delta())
+        exit()
 
     def set_train_facts(self,facts):
         self.train_facts = facts
