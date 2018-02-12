@@ -1,4 +1,6 @@
 from math import exp
+from Logic import Prover
+
 class Node(object):
 
     def __init__(self,label,clause,ip=False,op=False):
@@ -55,7 +57,45 @@ class RelNN(object):
     def __init__(self,description_file):
         self.nodes = []
         self.read_network_description(description_file)
-        self.forward_propogate(1)
+        self.train_facts = []
+        self.train_examples = []
+
+    def compute_ip_node_values(self,example):
+        predicate = example.split(" ")[0]
+        facts = self.train_facts
+        print (predicate)
+        literal_name = predicate.split("(")[0]
+        clause_head = ""
+        for node in self.get_nodes():
+            rule = node.get_clause()
+            rule_body = rule.split(";")
+            for item in rule_body:
+                item_name = item.split("(")[0]
+                if item_name == literal_name:
+                    clause_head = item
+        for node in self.get_nodes():
+            if node.is_input():
+                clause_body = node.get_clause().replace(";",",")
+                clause = clause_head+":-"+clause_body
+                if clause_body != "true":
+                    truth = Prover.prove(facts,predicate,clause)
+                    node.set_value(int(truth))
+        for node in self.get_nodes():
+            if node.is_input():
+                print (node.get_clause(),node.get_value())
+        exit()
+
+    def learn(self,facts,examples):
+        self.set_train_facts(facts)
+        self.set_train_examples(examples)
+        for example in self.train_examples:
+            self.compute_ip_node_values(example)
+
+    def set_train_facts(self,facts):
+        self.train_facts = facts
+
+    def set_train_examples(self,examples):
+        self.train_examples = examples
 
     def activation(self,x):
         return exp(x)/float(1+exp(x))
@@ -78,7 +118,10 @@ class RelNN(object):
                 value = n.get_value()
                 weight = n.get_connection_weight(node)
                 total += weight*value
-        node.set_value(self.activation(total))
+        if node.is_output():
+            node.set_value(total)
+        else:
+            node.set_value(self.activation(total))
 
     def finished_computation_on_all_nodes(self):
         for node in self.get_nodes():
@@ -164,9 +207,14 @@ class RelNN(object):
 file = []
 with open("desc.txt") as f:
     file = f.read().splitlines()
-    
-net1 = RelNN(file)
+facts,examples = [],[]
+with open("facts.txt") as f:
+    facts = f.read().splitlines()
+with open("examples.txt") as f:
+    examples = f.read().splitlines()
 
+net1 = RelNN(file)
+net1.learn(facts,examples)
 
 
         
