@@ -1,5 +1,6 @@
 from math import exp
 from Logic import Prover
+from copy import deepcopy
 
 class Node(object):
 
@@ -11,7 +12,7 @@ class Node(object):
         if ip:
             self.value = 1
         else:
-            self.value = False
+            self.value = None
         self.connections = []
 
     def add_connection(self,node,weight):
@@ -63,7 +64,6 @@ class RelNN(object):
     def compute_ip_node_values(self,example):
         predicate = example.split(" ")[0]
         facts = self.train_facts
-        print (predicate)
         literal_name = predicate.split("(")[0]
         clause_head = ""
         for node in self.get_nodes():
@@ -80,16 +80,14 @@ class RelNN(object):
                 if clause_body != "true":
                     truth = Prover.prove(facts,predicate,clause)
                     node.set_value(int(truth))
-        for node in self.get_nodes():
-            if node.is_input():
-                print (node.get_clause(),node.get_value())
-        exit()
 
     def learn(self,facts,examples):
         self.set_train_facts(facts)
         self.set_train_examples(examples)
         for example in self.train_examples:
             self.compute_ip_node_values(example)
+            self.forward_propogate()
+            exit()
 
     def set_train_facts(self,facts):
         self.train_facts = facts
@@ -112,26 +110,34 @@ class RelNN(object):
         if node.is_input():
             return
         for n in incoming_nodes:
-            if not n.get_value():
+            if n.get_value() == None:
                 return
-            else:
+            elif n.get_value():
                 value = n.get_value()
                 weight = n.get_connection_weight(node)
                 total += weight*value
         if node.is_output():
             node.set_value(total)
-        else:
-            node.set_value(self.activation(total))
+        elif not node.is_output():
+            total = self.activation(total)
+            node.set_value(total)
 
     def finished_computation_on_all_nodes(self):
         for node in self.get_nodes():
-            if not node.get_value():
+            if node.get_value() == None:
                 return False
         return True
 
-    def forward_propogate(self,example):
+    def forward_propogate(self):
+        for node in self.get_nodes():
+            if node.is_input():
+                print (node.get_value())
+        nodes_copy = deepcopy(self.get_nodes())
         while True:
-            for node in self.get_nodes():
+            nodes = self.get_nodes()
+            N = len(nodes)
+            for i in range(N):
+                node = nodes[i]
                 incoming_nodes = self.get_incoming(node)
                 self.compute_node_value(node,incoming_nodes)
             if self.finished_computation_on_all_nodes():
