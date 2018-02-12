@@ -62,11 +62,12 @@ class Node(object):
     
 class RelNN(object):
 
-    def __init__(self,description_file):
+    def __init__(self,description_file,learning_rate=0.1):
         self.nodes = []
         self.read_network_description(description_file)
         self.train_facts = []
         self.train_examples = []
+        self.learning_rate = 0.1
 
     def compute_ip_node_values(self,example):
         predicate = example.split(" ")[0]
@@ -95,6 +96,13 @@ class RelNN(object):
             self.compute_ip_node_values(example)
             self.forward_propogate()
             self.backward_propogate(example)
+        nodes = self.get_nodes()
+        for node in nodes:
+            if node.is_output():
+                continue
+            cs = node.get_connections()
+            for c in cs:
+                print (node.get_label(),c[0].get_label(),c[1])
 
     def compute_output_delta(self,example):
         example_value = float(example.split(" ")[1])
@@ -138,8 +146,14 @@ class RelNN(object):
         self.compute_deltas(example)
         nodes = self.get_nodes()
         for node in nodes:
-            print(node.get_label(),node.get_delta())
-        exit()
+            if node.is_output():
+                continue
+            connections = node.get_connections()
+            for connection in connections:
+                c_node = connection[0]
+                weight = node.get_connection_weight(c_node)
+                weight += self.learning_rate*node.get_value()*c_node.get_delta()
+                connection[1] = weight
 
     def set_train_facts(self,facts):
         self.train_facts = facts
@@ -169,6 +183,7 @@ class RelNN(object):
                 weight = n.get_connection_weight(node)
                 total += weight*value
         if node.is_output():
+            total = self.activation(total)
             node.set_value(total)
         elif not node.is_output():
             total = self.activation(total)
@@ -181,10 +196,6 @@ class RelNN(object):
         return True
 
     def forward_propogate(self):
-        for node in self.get_nodes():
-            if node.is_input():
-                print (node.get_value())
-        nodes_copy = deepcopy(self.get_nodes())
         while True:
             nodes = self.get_nodes()
             N = len(nodes)
@@ -194,8 +205,6 @@ class RelNN(object):
                 self.compute_node_value(node,incoming_nodes)
             if self.finished_computation_on_all_nodes():
                 break
-        for node in self.get_nodes():
-            print (node.get_label(),node.get_value())
 
     def add_node(self,node):
         self.nodes.append(node)
