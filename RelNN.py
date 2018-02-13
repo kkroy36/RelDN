@@ -62,12 +62,12 @@ class Node(object):
     
 class RelNN(object):
 
-    def __init__(self,description_file,learning_rate=0.1):
+    def __init__(self,description_file,learning_rate=0.01):
         self.nodes = []
         self.read_network_description(description_file)
         self.train_facts = []
         self.train_examples = []
-        self.learning_rate = 0.1
+        self.learning_rate = learning_rate
 
     def compute_ip_node_values(self,example):
         predicate = example.split(" ")[0]
@@ -96,13 +96,17 @@ class RelNN(object):
             self.compute_ip_node_values(example)
             self.forward_propogate()
             self.backward_propogate(example)
-        nodes = self.get_nodes()
-        for node in nodes:
-            if node.is_output():
-                continue
-            cs = node.get_connections()
-            for c in cs:
-                print (node.get_label(),c[0].get_label(),c[1])
+        with open("NN_dot_file.txt","a") as df:
+            df.write("digraph G {\n")
+            nodes = self.get_nodes()
+            for node in nodes:
+                if node.is_output():
+                    continue
+                cs = node.get_connections()
+                for c in cs:
+                    df.write("\""+node.get_label()+"("+node.get_clause()+")\"->\""+ c[0].get_label()+"("+c[0].get_clause()+")\"[label = "+str(c[1])+"]\n")
+                    print (node.get_label(),c[0].get_label(),c[1])
+            df.write("}")
 
     def compute_output_delta(self,example):
         example_value = float(example.split(" ")[1])
