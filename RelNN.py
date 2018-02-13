@@ -96,7 +96,7 @@ class RelNN(object):
             self.compute_ip_node_values(example)
             self.forward_propogate()
             self.backward_propogate(example)
-        with open("NN_dot_file.txt","a") as df:
+        with open("NN_dot_file.dot","a") as df:
             df.write("digraph G {\n")
             nodes = self.get_nodes()
             for node in nodes:
