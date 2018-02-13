@@ -117,7 +117,7 @@ class RelNN(object):
             self.forward_propogate()
             self.backward_propogate(example)
         with open("NN_dot_file.dot","a") as df:
-            df.write("digraph G {\n")
+            df.write("digraph G {"rankdir=LR;"+\n")
             nodes = self.get_nodes()
             for node in nodes:
                 if node.is_output():
