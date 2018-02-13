@@ -5,27 +5,36 @@ from copy import deepcopy
 class Node(object):
 
     def __init__(self,label,clause,ip=False,op=False):
-        self.label = label
-        self.clause = clause
-        self.ip = ip
-        self.op = op
-        self.delta = None
+	'''constructor for node object'''
+
+        self.label = label #node label == identifier
+        self.clause = clause #node clause == either a single predicate or a clause
+        self.ip = ip #whether input node or not
+        self.op = op #whether output node or not
+        self.delta = None #stores the gradients required during backprop
         if ip:
-            self.value = 1
+            self.value = 1 #output of the node
         else:
             self.value = None
-        self.connections = []
+        self.connections = [] #nodes that the node is connected to
 
     def set_delta(self,value):
+	'''set gradient value'''
         self.delta = value
 
     def get_delta(self):
+	'''get gradient value'''
         return self.delta
 
     def add_connection(self,node,weight):
+	'''add a new node as a connection'''
         self.connections.append([node,weight])
 
     def get_connection_weight(self,node):
+	'''for all connections
+	   get connected node and
+           get connection weight if match
+	'''
         for connection in self.get_connections():
             connected_node = connection[0]
             if node.get_label() == connected_node.get_label():
@@ -33,9 +42,11 @@ class Node(object):
                 return weight
 
     def get_connections(self):
+	'''return all connected nodes'''
         return self.connections
 
     def is_connection(self,node):
+	'''check if current node connected to node in param'''
         for connection in self.get_connections():
             connected_node = connection[0]
             if node.get_label() == connected_node.get_label():
@@ -43,26 +54,33 @@ class Node(object):
         return False
 
     def get_value(self):
+	'''get output at node'''
         return self.value
 
     def set_value(self,value):
+	'''set output at node'''
         self.value = value
 
     def get_label(self):
+	'''get identifier of node'''
         return self.label
 
     def get_clause(self):
+	'''get clause at node (might be horn with no body)'''
         return self.clause
 
     def is_input(self):
+	'''return if node is in input layer'''
         return self.ip
 
     def is_output(self):
+	'''return if node in output layer'''
         return self.op
     
 class RelNN(object):
 
     def __init__(self,description_file,learning_rate=0.01):
+	'''constructor for Relational Neural Network'''
         self.nodes = []
         self.read_network_description(description_file)
         self.train_facts = []
@@ -70,6 +88,7 @@ class RelNN(object):
         self.learning_rate = learning_rate
 
     def compute_ip_node_values(self,example):
+	'''computes value of input nodes using proof tree'''
         predicate = example.split(" ")[0]
         facts = self.train_facts
         literal_name = predicate.split("(")[0]
@@ -90,6 +109,7 @@ class RelNN(object):
                     node.set_value(int(truth))
 
     def learn(self,facts,examples):
+	'''learns weights through backprop'''
         self.set_train_facts(facts)
         self.set_train_examples(examples)
         for example in self.train_examples:
@@ -109,6 +129,7 @@ class RelNN(object):
             df.write("}")
 
     def compute_output_delta(self,example):
+	'''computes output gradient (typically y - yhat)'''
         example_value = float(example.split(" ")[1])
         nodes = self.get_nodes()
         for node in nodes:
@@ -117,6 +138,7 @@ class RelNN(object):
                 node.set_delta(delta)
 
     def finished_all_deltas(self):
+	'''checks if gradient at all nodes computed'''
         nodes = self.get_nodes()
         for node in nodes:
             if node.get_delta()==None:
@@ -124,6 +146,7 @@ class RelNN(object):
         return True
 
     def compute_deltas(self,example):
+	'''computes gradient at all nodes'''
         nodes = self.get_nodes()
         self.compute_output_delta(example)
         while True:
@@ -147,6 +170,7 @@ class RelNN(object):
                 break
 
     def backward_propogate(self,example):
+	'''performs backprop to learn weights'''
         self.compute_deltas(example)
         nodes = self.get_nodes()
         for node in nodes:
@@ -160,15 +184,19 @@ class RelNN(object):
                 connection[1] = weight
 
     def set_train_facts(self,facts):
+	'''sets training facts'''
         self.train_facts = facts
 
     def set_train_examples(self,examples):
+	'''sets training examples'''
         self.train_examples = examples
 
     def activation(self,x):
-        return exp(x)/float(1+exp(x))
+	'''activation function at nodes'''
+        return exp(x)/float(1+exp(x)) #sigmoid
 
     def get_incoming(self,node):
+	'''gets all incoming connection nodes'''
         incoming_nodes = []
         for n in self.get_nodes():
             if n.is_connection(node):
@@ -176,6 +204,7 @@ class RelNN(object):
         return incoming_nodes
 
     def compute_node_value(self,node,incoming_nodes):
+	'''computes value as weighted sum of incoming connections'''
         total = 0
         if node.is_input():
             return
@@ -194,12 +223,14 @@ class RelNN(object):
             node.set_value(total)
 
     def finished_computation_on_all_nodes(self):
+	'''checks if all node values have been computed'''
         for node in self.get_nodes():
             if node.get_value() == None:
                 return False
         return True
 
     def forward_propogate(self):
+	'''perform forward propogation to compute node outputs'''
         while True:
             nodes = self.get_nodes()
             N = len(nodes)
@@ -211,12 +242,15 @@ class RelNN(object):
                 break
 
     def add_node(self,node):
+	'''add a node to the neural node'''
         self.nodes.append(node)
 
     def get_nodes(self):
+	'''get all nodes in the network'''
         return self.nodes
 
     def make_input_node(self,input_node_desc):
+	'''add input node(s) to network structure'''
         nodes = input_node_desc.split(":")[1].replace(" ","")
         nodes = nodes.split("|")
         for node in nodes:
@@ -226,6 +260,7 @@ class RelNN(object):
             self.add_node(ip_node)
 
     def make_node(self,node_desc):
+	'''add hidden node(s) to network structure'''
         nodes = node_desc.split(":")[1].replace(" ","")
         nodes = nodes.split("|")
         for node in nodes:
@@ -235,6 +270,7 @@ class RelNN(object):
             self.add_node(h_node)
 
     def make_output_node(self,output_node_desc):
+	'''add output node to network structure'''
         nodes = output_node_desc.split(":")[1].replace(" ","")
         nodes = nodes.split("|")
         for node in nodes:
@@ -244,6 +280,7 @@ class RelNN(object):
             self.add_node(op_node)
 
     def make_connection(self,direction,weight):
+	'''add connection between two nodes to network structure'''
         from_node_label = direction.split("-")[0]
         to_node_label = direction.split("-")[1]
         from_node,to_node = False,False
@@ -257,6 +294,7 @@ class RelNN(object):
         from_node.add_connection(to_node,weight)
 
     def make_connections(self,connection_desc):
+	'''add all connections between nodes to network structure'''
         connections = connection_desc.split(":")[1].replace(" ","")
         connections = connections.split("|")
         for connection in connections:
@@ -265,6 +303,10 @@ class RelNN(object):
             self.make_connection(direction,weight)
 
     def read_network_description(self,desc_file):
+	'''read description file
+	   adds input nodes, hidden nodes and output nodes
+           also adds connections between nodes with init weights
+	'''
         for desc in desc_file:
             if "input_node" in desc:
                 self.make_input_node(desc)
@@ -275,6 +317,7 @@ class RelNN(object):
             if "connect" in desc:
                 self.make_connections(desc)
 
+'''testing file reading'''
 file = []
 with open("desc.txt") as f:
     file = f.read().splitlines()
@@ -284,8 +327,6 @@ with open("facts.txt") as f:
 with open("examples.txt") as f:
     examples = f.read().splitlines()
 
+'''testing neural network learning'''
 net1 = RelNN(file)
 net1.learn(facts,examples)
-
-
-        
