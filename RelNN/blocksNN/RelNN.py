@@ -216,7 +216,7 @@ class RelNN(object):
                 weight = n.get_connection_weight(node)
                 total += weight*value
         if node.is_output():
-            total = self.activation(total)
+            #total = self.activation(total)
             node.set_value(total)
         elif not node.is_output():
             total = self.activation(total)

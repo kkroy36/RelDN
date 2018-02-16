@@ -150,7 +150,7 @@ class Blocks_world():
 '''
 with open("blocks_world_out.txt","a") as f:
     i = 0
-    while i < 2:
+    while i < 3:
         state = Blocks_world(start=True)
         f.write("start state: "+str(state.get_state_facts())+"\n")
         while not state.goal():
