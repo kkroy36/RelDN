@@ -28,7 +28,7 @@ class PI(object):
         facts,examples,bk = [],[],[]
         i = 0
         values = {}
-        while i < self.transfer*5+5:
+        while i < self.transfer*5+3:
             if self.simulator == "blocks":
                 state = Blocks_world(start=True)
                 if not bk:
@@ -60,7 +60,7 @@ class PI(object):
                             example_predicate = "value(s"+str(key[0])+") "+str(values[key])
                             examples.append(example_predicate)
                         i += 1
-            reg = GradientBoosting(regression=True,treeDepth=3,trees=self.trees,sampling_rate=0.05,loss=self.loss)
+            reg = GradientBoosting(regression=True,treeDepth=2,trees=self.trees,sampling_rate=0.05,loss=self.loss)
             reg.setTargets(["value"])
             reg.learn(facts,examples,bk)
             self.model = reg
