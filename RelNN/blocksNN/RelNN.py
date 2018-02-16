@@ -86,6 +86,8 @@ class RelNN(object):
         self.train_facts = []
         self.train_examples = []
         self.learning_rate = learning_rate
+        self.test_facts = []
+        self.test_examples = []
 
     def compute_ip_node_values(self,example):
 	'''computes value of input nodes using proof tree'''
@@ -183,6 +185,13 @@ class RelNN(object):
                 weight += self.learning_rate*node.get_value()*c_node.get_delta()
                 connection[1] = weight
 
+    def set_test_facts(self,facts):
+        '''sets testing facts'''
+        self.test_facts = facts
+
+    def set_test_examples(self,examples):
+        self.test_examples = examples
+
     def set_train_facts(self,facts):
 	'''sets training facts'''
         self.train_facts = facts
@@ -228,6 +237,19 @@ class RelNN(object):
             if node.get_value() == None:
                 return False
         return True
+
+    def test(self,facts,examples):
+        '''compute value of examples by forward prop'''
+        self.set_test_facts(facts)
+        self.set_test_examples(examples)
+        for example in self.test_examples:
+            print ("example: ",example)
+            self.compute_ip_node_values(example)
+            self.forward_propogate()
+        nodes = self.get_nodes()
+        for node in nodes:
+            if node.is_output():
+                print ("value: ",node.get_value())
 
     def forward_propogate(self):
 	'''perform forward propogation to compute node outputs'''
@@ -321,12 +343,17 @@ class RelNN(object):
 file = []
 with open("desc.txt") as f:
     file = f.read().splitlines()
-facts,examples = [],[]
+facts,examples,t_facts,t_examples = [],[],[],[]
 with open("facts.txt") as f:
     facts = f.read().splitlines()
 with open("examples.txt") as f:
     examples = f.read().splitlines()
+with open("test_facts.txt") as f:
+    t_facts = f.read().splitlines()
+with open("test_examples.txt") as f:
+    t_examples = f.read().splitlines()
 
 '''testing neural network learning'''
 net1 = RelNN(file)
 net1.learn(facts,examples)
+net1.test(t_facts,t_examples)
