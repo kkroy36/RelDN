@@ -1,0 +1,4 @@
+input_node: a("nodeIn(S,A,N)") | b("overloaded(S,A)") | c("cyclic(S,N)")
+node: d("h1(S)") | e("h2(S)") | f("h3(S)") | g("h4(S)")
+output_node: i("value(S)")
+connect: a-d,1 | b-d,1 | a-e,1 | c-e,1 | d-f,1 | e-f,1 | b-f,1 | a-f,1 | c-f,1 | e-g,1 | b-g,1 | c-g,1 | f-i,1 | g-i,1  

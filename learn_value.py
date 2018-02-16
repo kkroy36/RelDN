@@ -1,8 +1,9 @@
 from blocks import Blocks_world
+from net_admin import Admin
 from time import clock
 from GradientBoosting import GradientBoosting
 
-class PI(object):
+class IRL(object):
 
     def __init__(self,transfer=0,simulator="blocks",batch_size=1,number_of_iterations=10,loss="LS",trees=10):
         self.transfer = transfer
@@ -35,6 +36,10 @@ class PI(object):
                 state = Blocks_world(number=self.state_number,start=True)
                 if not bk:
                     bk = Blocks_world.bk
+            elif self.simulator == "net_admin":
+                state = Admin(number=self.state_number,start=True)
+                if not bk:
+                    bk = Admin.bk
             with open(self.simulator+"_transfer_out.txt","a") as f:
                 if self.transfer:
                     f.write("start state: "+str(state.get_state_facts())+"\n")
@@ -52,7 +57,7 @@ class PI(object):
                     trajectory.append((state.state_number,state.get_state_facts()))
                     end = clock()
                     time_elapsed = abs(end-start)
-                    if self.simulator == "blocks" and time_elapsed > 1:
+                    if self.simulator == "net_admin" and time_elapsed > 1:
                         within_time = False
                         break
                 if within_time:
@@ -63,7 +68,8 @@ class PI(object):
                         example_predicate = "value(s"+str(key[0])+") "+str(values[key])
                         examples.append(example_predicate)
                     i += 1
-                    print("incremented: ",i)
+
+        '''
         with open("facts.txt","a") as f:
             for fact in facts:
                 f.write(fact+"\n")
@@ -72,8 +78,7 @@ class PI(object):
                 f.write(example+"\n")
                     
         '''
-        reg = GradientBoosting(regression=True,treeDepth=2,trees=self.trees,sampling_rate=0.05,loss=self.loss)
+        reg = GradientBoosting(regression=True,treeDepth=3,trees=self.trees,sampling_rate=0.1,loss=self.loss)
         reg.setTargets(["value"])
         reg.learn(facts,examples,bk)
         self.model = reg    
-        '''
