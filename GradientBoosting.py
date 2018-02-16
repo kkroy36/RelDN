@@ -22,9 +22,9 @@ class GradientBoosting(object):
     def setTargets(self,targets):
         self.targets = targets
 
-    def learn(self,facts,examples,bk):
+    def learn(self,facts=None,examples=None,bk=None,pos=None,neg=None):
         for target in self.targets:
-            data = Utils.setTrainingData(target=target,facts=facts,examples=examples,bk=bk,regression=self.regression,sampling_rate = self.sampling_rate)
+            data = Utils.setTrainingData(target=target,facts=facts,examples=examples,bk=bk,regression=self.regression,sampling_rate = self.sampling_rate,pos=pos,neg=neg)
             trees = []
             for i in range(self.numberOfTrees):
                 print ('='*20,"learning tree",str(i),'='*20)

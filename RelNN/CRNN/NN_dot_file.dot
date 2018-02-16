@@ -1,0 +1,9 @@
+digraph G {rankdir=LR;
+"a(on(S,A,B))"->"h1(D(S))"[label = 0.95663516704]
+"b(clear(S,A))"->"h1(D(S))"[label = 0.95663516704]
+"c(clear(S,A))"->"h2(K(S))"[label = 0.976206615402]
+"d(on_table(S,A,table))"->"h2(K(S))"[label = 0.976206615402]
+"e(true)"->"cr(putdown(S))"[label = 0.846092473458]
+"h1(D(S))"->"cr(putdown(S))"[label = -0.141928296021]
+"h2(K(S))"->"cr(putdown(S))"[label = 0.254825792602]
+}

@@ -191,12 +191,14 @@ class Utils(object):
         Utils.data = Data()
         Utils.data.regression = regression
         sampled_facts = [fact for fact in facts if random.random() < sampling_rate]
-        sampled_examples = [example for example in examples if random.random() < sampling_rate]
         Utils.data.setFacts(sampled_facts)
         if not regression:
-            Utils.data.setPos(pos,target)
-            Utils.data.setNeg(neg,target)
+            sampled_pos = [ex for ex in pos if random.random() < sampling_rate]
+            sampled_neg = [ex for ex in neg if random.random() < sampling_rate]
+            Utils.data.setPos(sampled_pos,target)
+            Utils.data.setNeg(sampled_neg,target)
         elif regression:
+            sampled_examples = [example for example in examples if random.random() < sampling_rate]
             Utils.data.setExamples(sampled_examples,target)
         Utils.data.setBackground(bk)
         if not regression:

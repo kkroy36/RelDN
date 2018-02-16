@@ -1,0 +1,4 @@
+input_node: a("on(S,A,B)") | b("clear(S,A)") | c("clear(S,A)") | d("on_table(S,A,table)") | e("true")
+node: h1("D(S)") | h2("K(S)")
+output_node: cr("putdown(S)")
+connect: a-h1,1 | b-h1,1 | c-h2,1 | d-h2,1 | h1-cr,1 | h2-cr,1 | e-cr,1
