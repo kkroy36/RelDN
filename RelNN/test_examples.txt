@@ -1,0 +1,10 @@
+male(p1) 0
+male(p2) 0
+male(p3) 0
+male(p4) 1
+male(p5) 1
+male(p6) 1
+male(p7) 1
+male(p8) 1
+male(p9) 1
+male(p10) 1

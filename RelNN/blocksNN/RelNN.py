@@ -1,6 +1,7 @@
 from math import exp
 from Logic import Prover
 from copy import deepcopy
+from sklearn.metrics import mean_squared_error
 
 class Node(object):
 
@@ -114,10 +115,11 @@ class RelNN(object):
 	'''learns weights through backprop'''
         self.set_train_facts(facts)
         self.set_train_examples(examples)
-        for example in self.train_examples:
-            self.compute_ip_node_values(example)
-            self.forward_propogate()
-            self.backward_propogate(example)
+        for i in range(1):
+            for example in self.train_examples:
+                self.compute_ip_node_values(example)
+                self.forward_propogate()
+                self.backward_propogate(example)
         with open("NN_dot_file.dot","a") as df:
             df.write("digraph G {rankdir=LR;"+"\n")
             nodes = self.get_nodes()
@@ -242,14 +244,19 @@ class RelNN(object):
         '''compute value of examples by forward prop'''
         self.set_test_facts(facts)
         self.set_test_examples(examples)
+        y_actual,y_pred = [],[]
         for example in self.test_examples:
             print ("example: ",example)
+            y_actual.append(float(example.split(" ")[1]))
             self.compute_ip_node_values(example)
             self.forward_propogate()
-        nodes = self.get_nodes()
-        for node in nodes:
-            if node.is_output():
-                print ("value: ",node.get_value())
+            nodes = self.get_nodes()
+            for node in nodes:
+                if node.is_output():
+                    node_value = node.get_value()
+                    y_pred.append(float(node_value))
+                    print ("value: ",node_value)
+        print ("mean squared error: ",mean_squared_error(y_actual,y_pred))
 
     def forward_propogate(self):
 	'''perform forward propogation to compute node outputs'''

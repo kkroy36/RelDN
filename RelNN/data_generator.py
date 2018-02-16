@@ -44,9 +44,9 @@ for p in people:
         else:
             facts.append("likes("+p+","+item[0]+")")
 
-with open("facts.txt","a") as f:
+with open("test_facts.txt","a") as f:
     for fact in facts:
         f.write(fact+"\n")
-with open("examples.txt","a") as f:
+with open("test_examples.txt","a") as f:
     for example in examples:
         f.write(example+"\n")
