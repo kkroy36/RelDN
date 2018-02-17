@@ -1,4 +1,4 @@
-input_node: a("on(S,A,B)") | b("clear(S,A)") | c("clear(S,A)") | d("on_table(S,A,table)") | e("true")
-node: h1("D(S)") | h2("K(S)")
+input_node: a("on(S,A,B)") | b("clear(S,A)") | c("clear(S,A)") | d("on_table(S,A,table)") | f("on(S,A,B)") | g("clear(S,A)") | e("true")
+node: h1("t1(S)") | h2("k(S)") | h3("t2c1(S)") | h4("t2c2(S)") | h5("x1(S)") | h6("x2(S)") | h7("t2(S)") | h8("d(s)") 
 output_node: cr("putdown(S)")
-connect: a-h1,1 | b-h1,1 | c-h2,1 | d-h2,1 | h1-cr,1 | h2-cr,1 | e-cr,1
+connect: a-h1,1 | b-h1,1 | c-h2,1 | d-h2,1 | f-h3,1 | g-h4,1 | h3-h5,1 | h3-h6,1 | h4-h5,1 | h4-h6,1 | h5-h7,1 | h6-h7,1 | h1-h8,1 | h7-h8,1 | h8-cr,1 | h2-cr,1
