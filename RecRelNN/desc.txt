@@ -1,0 +1,5 @@
+input_node: a("i1(X)") | b("i2(X)")
+node: c("h1(X)") | d("h2(X)")
+rec_node: e("s(X)")
+output_node: f("y(X)")
+connect: a-c,1 | b-d,1 | c-e,1 | d-e,1 | e-f,1 
