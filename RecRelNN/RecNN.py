@@ -1,6 +1,7 @@
 from math import exp
 from Logic import Prover
 from copy import deepcopy
+#make modifications in the learn function beyond forward prop
 
 class Node(object):
 
