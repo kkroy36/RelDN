@@ -23,7 +23,11 @@ class GradientBoosting(object):
         self.targets = targets #sets the targets
 
     def learn(self,facts=None,examples=None,bk=None,pos=None,neg=None):
-	'''learns the regression tree per target'''
+	'''learns the regression tree per target
+           before learning, make sure that the training and test
+           and bk files are all in the default format.
+           change all formats as required as required during runtime.
+	'''
         for target in self.targets: #for every target learn
             data = Utils.setTrainingData(target=target,facts=facts,examples=examples,bk=bk,regression=self.regression,sampling_rate = self.sampling_rate,pos=pos,neg=neg)
             trees = [] #initialize place holder for trees
