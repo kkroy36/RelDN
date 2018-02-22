@@ -80,49 +80,52 @@ class Node(object):
         return self.op
 
     def __repr__(self):
+	'''returns when call to print or str
+           label of node + clause in the node
+	'''
         return self.get_label()+"(\""+self.get_clause()+"\")"
     
 class RelNN(object):
 
     def __init__(self,description_file,learning_rate=0.01):
 	'''constructor for Relational Neural Network'''
-        self.nodes = []
-        self.read_network_description(description_file)
-        self.train_facts = []
-        self.train_examples = []
-        self.learning_rate = learning_rate
-        self.test_facts = []
-        self.test_examples = []
+        self.nodes = [] #nodes in the network
+        self.read_network_description(description_file) #read the desc file
+        self.train_facts = [] #place holder for training facts
+        self.train_examples = [] #place holder for training examples
+        self.learning_rate = learning_rate #place holder for learning rate
+        self.test_facts = [] #place holder for testing facts
+        self.test_examples = [] #place holder for testing examples
 
     def common_connection(self,s,node2):
-        node2_connections = node2.get_connections()
-        node2_connections = [str(n[0]) for n in node2_connections]
-        for node in s:
+        node2_connections = node2.get_connections() #get connections of node in parameter
+        node2_connections = [str(n[0]) for n in node2_connections] #convert to readable rep
+        for node in s: #for every node, get connections of the node
             node_connections = node.get_connections()
             c = len([n for n in node_connections if str(n[0]) in node2_connections])
-            if not c:
+            if not c: #if no connections in common then return false
                 return False
         return True
     
     def get_sets_ip_nodes(self):
-        nodes = self.get_nodes()
-        sets = []
-        for node in nodes:
+        nodes = self.get_nodes() #get set's of input nodes with the same connecting nodes
+        sets = [] #place holder for the sets
+        for node in nodes: #for every node append every individual nodes as is
             if node.is_input():
                 sets.append([node])
-        for node in nodes:
+        for node in nodes: #if node is not an input node then continue
             if not node.is_input():
                 continue
-            for s in sets:
-                if self.common_connection(s,node):
+            for s in sets: #for every set in sets, if node has common connection with the set
+                if self.common_connection(s,node): #if node node not already in the set
                     if node not in s:
-                        s.append(node)
-        sets = [sorted(x) for x in sets]
-        u_sets = []
-        for s in sets:
+                        s.append(node) #append the node to the set
+        sets = [sorted(x) for x in sets] #sort the sets to make unique
+        u_sets = [] 
+        for s in sets: #for every set, if set isn't repeating keep
             if s not in u_sets:
                 u_sets.append(s)
-        return u_sets
+        return u_sets #return unique sets.
 
     def compute_ip_node_values(self,example,test=False):
 	'''computes value of input nodes using proof tree'''
@@ -394,18 +397,18 @@ class RelNN(object):
 '''testing file reading'''
 file = []
 with open("desc.txt") as f:
-    file = f.read().splitlines()
-facts,examples,t_facts,t_examples = [],[],[],[]
+    file = f.read().splitlines() #read the neural network description file
+facts,examples,t_facts,t_examples = [],[],[],[] #place holder's for train and test files
 with open("facts.txt") as f:
-    facts = f.read().splitlines()
+    facts = f.read().splitlines() #read facts about training examples
 with open("examples.txt") as f:
-    examples = f.read().splitlines()
+    examples = f.read().splitlines() #read training exampleds
 with open("test_facts.txt") as f:
-    t_facts = f.read().splitlines()
+    t_facts = f.read().splitlines() #read the facts about testing examples
 with open("test_examples.txt") as f:
-    t_examples = f.read().splitlines()
+    t_examples = f.read().splitlines() #read the testing examples
 
 '''testing neural network learning'''
-net1 = RelNN(file)
-net1.learn(facts,examples)
+net1 = RelNN(file) #create Relational Neural Network with the desc file
+net1.learn(facts,examples) #train the network
 net1.test(t_facts,t_examples)
