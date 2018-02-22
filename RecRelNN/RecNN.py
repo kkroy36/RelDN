@@ -172,7 +172,10 @@ class RecRelNN(object):
                 print (example)
                 self.compute_ip_node_values(example)
                 self.forward_propogate()
-                exit()
+        nodes = self.get_nodes()
+        for node in nodes:
+	    print (node,node.get_value())
+	exit()
 
     def get_incoming(self,node):
 	'''gets all incoming connection nodes'''
