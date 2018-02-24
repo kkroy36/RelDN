@@ -1,0 +1,2 @@
+-1.2875 move(S):-tIn(S,T,C);bOn(S,B,T)
+-1.25 unload(S):-tIn(S,T,C);bOn(S,B,T);destination(S,C)
